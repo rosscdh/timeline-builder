@@ -29,4 +29,7 @@ push:
 	docker push ${LATEST}
 
 run:
-	docker run -p8090:8080 ${LATEST}
+	docker run --rm -it -v ${PWD}/src:/src ${LATEST} ${URL}
+
+enter:
+	docker run --rm -it -v ${PWD}/src:/src --entrypoint bash ${LATEST} 
