@@ -1,0 +1,4 @@
+click
+pyquery
+requests
+jinja2
