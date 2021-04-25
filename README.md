@@ -2,5 +2,5 @@
 
 ```
 make build
-make run URL=https://cofaux.cc/the-hospitals-are-overflowing/
+make run URL=https://example.com/the-hospitals-are-overflowing/
 ```
