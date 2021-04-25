@@ -10,12 +10,14 @@ BASE_TEMPLATE = Template("""
 <link rel="stylesheet" href="/content/images/vertical-timeline.css"/>
 <div id="myTimeline">
     {% for row in entries %}
-    <div data-vtdate="{{ row.date_of }}">
+    <div data-vtdate="{{ row.date_of.strftime('%Y-%m-%d') }}">
         {{ row.html | safe }}
     </div>
     {% endfor %}
 </div>
 <script type="text/javascript" async defer src="/content/images/vertical-timeline.min.js"></script>
+""")
+
 # <script type="text/javascript">
 # jQuery( document ).ready(function() {
 #     jQuery('#myTimeline').verticalTimeline({
@@ -26,7 +28,6 @@ BASE_TEMPLATE = Template("""
 #     });
 # });
 # </script>
-""")
 
 @click.command()
 @click.argument('url')
@@ -55,15 +56,21 @@ def cli(url):
             # import pdb;pdb.set_trace()
         except Exception as e:
             print(f"could not extract meta from {entry['url']}, have to get date manually")
+
+        click.echo(click.style(f"date_of: {entry['date_of']}", fg='yellow'))
+
         if not entry['date_of']:
             # import pdb;pdb.set_trace()
-            entry['date_of'] = click.prompt(click.style(f"Please enter a date for {entry['url']}", fg='green'), type=str)
+            entry['date_of'] = click.prompt(click.style(f"Please enter a date YYYY-MM-DD for {entry['url']}", fg='green'), type=str)
 
-        for fmt in ('DD MMMM YYYY', 'DD-MM-YYYY', 'MMMM YYYY', 'YYYY-MM-DD'):
+        for fmt in ('DD MMMM YYYY', 'DD-MM-YYYY', 'MMMM YYYY', 'YYYY-MM-DD', 'YYYY-MM-DDTHH:mm:ss.SZZ', 'YYYY-MM-DDTHH:mm:ssZ', 'YYYY-MM-DDTHH:mm:ss:+ZZ'):
             try:
-                entry['date_of'] = arrow.get(entry['date_of'], fmt).format()
+                entry['date_of'] = arrow.get(entry['date_of'], fmt)
             except:
                 continue
+        # import pdb;pdb.set_trace()
+        if isinstance(entry['date_of'], str):
+            entry['date_of'] = arrow.get(click.prompt(click.style(f"Please enter a date YYYY-MM-DD for {entry['url']}", fg='yellow'), type=str), 'YYYY-MM-DD')
 
         entries.append(entry)
 
